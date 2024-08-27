@@ -6,6 +6,6 @@ router = APIRouter(
 )
 
 
-@router.get('/')
-def get_auth():
+@router.get('/login')
+async def get_auth():
     return {"auth": "ok"}

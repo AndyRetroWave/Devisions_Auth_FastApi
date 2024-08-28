@@ -20,13 +20,12 @@ async def prepare_database():
             return json.load(f)
 
     user_mock = await open_mock_json("user")
-    print(user_mock)
 
     async with async_session_maker() as session:
         for user in user_mock:
             add_users = insert(User).values(user)
             await session.execute(add_users)
-        await session.commit()
+            await session.commit()
 
 
 @pytest.fixture(scope="session")

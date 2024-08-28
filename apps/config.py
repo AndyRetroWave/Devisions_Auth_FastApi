@@ -25,7 +25,7 @@ class Setting(BaseSettings):
 
     @property
     def TEST_DB_URL(self):
-        return f'postgresql+asyncpg://{self.TEST_DB_USER}:{self.TEST_DB_PASS}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/test_{self.TEST_DB_NAME}'
+        return f'postgresql+asyncpg://{self.TEST_DB_USER}:{self.TEST_DB_PASS}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{self.TEST_DB_NAME}'
 
 
 settings = Setting()

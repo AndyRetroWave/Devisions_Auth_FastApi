@@ -19,6 +19,16 @@ class Setting(BaseSettings):
     TEST_DB_HOST: str
     TEST_DB_NAME: str
 
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+
+    SECRET_KEY: str
+
+    API_SECRET_KEY: str
+    API_ALGORITHM: str
+
+    API_ACCESS_TOKEN_EXPIRE_MINUTES: int
+
     @property
     def DB_URL(self):
         return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'

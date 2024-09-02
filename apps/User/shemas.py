@@ -8,3 +8,7 @@ class UserShemas(BaseModel):
     family_name: str
     hashed_password: str
     is_active: bool
+
+
+class UserCheck(BaseModel):
+    email: EmailStr

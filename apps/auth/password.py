@@ -11,4 +11,4 @@ async def hash_password(password):
 
 async def check_password(password, hashed_password):
     # Проверяем, соответствует ли введенный пароль хешированному паролю
-    return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))

@@ -10,6 +10,7 @@ class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "apps" / "certs" / "private_key.pem"
     public_key_path: Path = BASE_DIR / "apps" / "certs" / "public_key.pem"
     algorithm: str = "RS256"
+    access_token_expire_minutes: int = 1
 
 
 class Setting(BaseSettings):
@@ -36,8 +37,6 @@ class Setting(BaseSettings):
 
     API_SECRET_KEY: str
     API_ALGORITHM: str
-
-    API_ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     AUTH_JWT: AuthJWT = AuthJWT()
 

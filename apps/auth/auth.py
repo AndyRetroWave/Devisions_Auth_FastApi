@@ -1,27 +1,22 @@
-import aiofiles
+
 from fastapi import APIRouter, Depends, FastAPI, Form
 from fastapi import Request
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+
 from apps.template.auth_html import AUTH_HTML
 from apps.auth.depends_auth_google import GoggleAuth
-from apps.user.shemas import UserCheck, UserShemas
+from apps.user.shemas import UserShemas
 
 from .password import hash_password
 from apps.user.dao import UserDAO
-from apps.config import settings
 
-
-from .utils import decode_jwt, encode_jwt
-
-
-class TokenInfo(BaseModel):
-    access_token: str
-    token_type: str
-
+from .utils import encode_jwt, TokenInfo, get_current_active_auth_user, validate_user_login
+from fastapi.security import HTTPBearer
 
 # Create the auth appauthlib google register fastapi
 auth_app = FastAPI()
+
+http_bearer = HTTPBearer()
 
 router = APIRouter(
     prefix='/auth',
@@ -73,17 +68,24 @@ async def auth(request: Request):
     return HTMLResponse(AUTH_HTML['welcome_register'])
 
 
-@router.post('/login')
-async def login(user: UserCheck):
-    user = await UserDAO.get_user_by_email(email=user.email)
-    token = await encode_jwt(
-        {"sub": user.email}
+@router.post('/login', response_model=TokenInfo)
+async def login(user: UserShemas = Depends(validate_user_login)):
+    token: str = await encode_jwt(
+        {"sub": user.email,
+         'given_name': user.given_name,
+         'family_name': user.family_name}
     )
-    return {'token': token}
-    # return TokenInfo(
-    #     access_token=token,
-    #     token_type="bearer"
-    # )
+    return TokenInfo(
+        access_token=token,
+        token_type="bearer"
+    )
+
+
+@router.get('/users/me')
+async def auth_user_check_self_info(
+    user: UserShemas = Depends(get_current_active_auth_user),
+):
+    return {'given_name': user.given_name, 'family_name': user.family_name}
 
 
 @auth_app.route(path='/login-google')

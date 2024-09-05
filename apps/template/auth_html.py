@@ -1,6 +1,5 @@
 AUTH_HTML = {
-    'welcome':
-    """
+    "welcome": """
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -53,10 +52,7 @@ AUTH_HTML = {
     </body>
     </html>
     """,
-
-
-
-    'register_good': """
+    "register_good": """
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -233,8 +229,6 @@ AUTH_HTML = {
 </html>
 
 """,
-
-
     "welcome_register": """
     <!DOCTYPE html>
     <html lang="ru">
@@ -293,9 +287,120 @@ AUTH_HTML = {
         </div>
     </body>
     </html>
-"""
+""",
+    "login": """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .login-container input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .login-container input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .google-btn:hover {
+            background-color: #f8f8f8;
+        }
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm" action="/auth/login" method="post">
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>
+        <div style="margin-top: 20px;">
+            <a href="/auth/login/google" class="google-btn">
+                <img src="https://img.icons8.com/?size=100&id=17950&format=png&color=000000" alt="Google" class="google-icon">
+                Зайти через Google
+            </a>
+        </div>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
 
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                # body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token && data.refresh_token) {
+                    // Store tokens in localStorage or sessionStorage
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    // Redirect to another page on success
+                    window.location.href = '/dashboard';
+                } else {
+                    document.getElementById('errorMessage').innerText = data.message || 'Login failed';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').innerText = 'An error occurred. Please try again later.';
+            });
+        });
+    </script>
+</body>
+</html>
+""",
 }

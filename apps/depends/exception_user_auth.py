@@ -27,3 +27,18 @@ class NotActiveException(UserExpectationException):
 class IncorrectTokenException(UserExpectationException):
     status_code = 401
     detail = "Неверный токен!"
+
+
+class IncorrectAccessTokenException(UserExpectationException):
+    status_code = 401
+    detail = "Вы указали не верный тип токена, укажите access_token!"
+
+
+class IncorrectInputPasswordException(UserExpectationException):
+    status_code = 401
+    detail = "Вы указали не правильный формат пароля"
+
+
+class IncorrectInputEmailException(UserExpectationException):
+    status_code = 401
+    detail = "Такой пользователь уже существует!"

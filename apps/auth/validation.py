@@ -38,7 +38,12 @@ async def validate_user_login(email: str = Form(), password: str = Form()) -> Us
 async def get_current_token_payload(
     credentials: HTTPBasicCredentials = Depends(http_bearer),
 ) -> UserShemas:
-    token = credentials.credentials
+    if isinstance(credentials, str):
+        token: str = credentials
+    else:
+        token: HTTPBasicCredentials = credentials.credentials
+    if token is None:
+        raise IncorrectTokenException()
     try:
         payload = await decode_jwt(token=token)
     except InvalidTokenError:

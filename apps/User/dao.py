@@ -19,7 +19,6 @@ class UserDAO(BaseDAO):
         try:
             async with async_session_maker() as session:
                 user = insert(cls.model).values(
-                    # id=id_primary_key_result,
                     given_name=given_names,
                     family_name=family_names,
                     email=email,

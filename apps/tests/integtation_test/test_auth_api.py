@@ -25,8 +25,8 @@ async def test_get_login(ac: AsyncClient):
     "email,password,status_code",
     [
         ("john.doe@example.com", "Andreykiller566576!", 200),
-        ("john.doe@example.com", "Andreykiller566576", 401),
-        ("vasia.johnson@example.com", "Andreykiller566576!", 401),
+        ("jane.smith@example.com", "Andreykiller566576", 401),
+        ("vasia.johnson@example.co.m", "Andreykiller566576!", 401),
     ],
 )
 async def test_login_api(email, password, status_code, ac: AsyncClient):

@@ -33,18 +33,20 @@ async def encode_jwt(
     to_encode: dict = payload.copy()
     now: datetime = datetime.utcnow()
     if expire_timedelta:
-        expire: str = now + expire_timedelta
+        expire: datetime = now + expire_timedelta
     else:
-        expire: str = now + timedelta(minutes=expire_minutes)
+        expire: datetime = now + timedelta(minutes=expire_minutes)
     to_encode.update({"exp": expire, "iat": now})
-    private_key = await read_key(settings.AUTH_JWT.private_key_path)
-    encoded = jwt.encode(to_encode, private_key, algorithm=algorithm)
+    private_key: str = await read_key(settings.AUTH_JWT.private_key_path)
+    encoded: str = jwt.encode(to_encode, private_key, algorithm=algorithm)
     return encoded
 
 
-async def decode_jwt(token: str | bytes, algorithm: str = settings.AUTH_JWT.algorithm):
+async def decode_jwt(
+    token: str | bytes, algorithm: str = settings.AUTH_JWT.algorithm
+) -> dict:
     public_key: str = await read_key(settings.AUTH_JWT.public_key_path)
-    decoded = jwt.decode(token, public_key, algorithms=[algorithm])
+    decoded: dict = jwt.decode(token, public_key, algorithms=[algorithm])
     return decoded
 
 
@@ -54,7 +56,7 @@ async def create_jwt(
     expires_minutes: int,
     expires_timedelta: timedelta | None = None,
 ) -> str:
-    jwt_payload = {TOKEN_TYPE_FIELD: token_type}
+    jwt_payload: dict = {TOKEN_TYPE_FIELD: token_type}
     jwt_payload.update(token_data)
     return await encode_jwt(
         payload=jwt_payload,
@@ -64,7 +66,7 @@ async def create_jwt(
 
 
 async def create_access_token(user: UserShemas) -> str:
-    payload = {
+    payload: dict = {
         "sub": user.email,
         "given_name": user.given_name,
         "family_name": user.family_name,
@@ -79,7 +81,7 @@ async def create_access_token(user: UserShemas) -> str:
 
 
 async def create_refresh_token(user: UserShemas) -> str:
-    fwt_payload = {
+    fwt_payload: dict = {
         "sub": user.email,
     }
     return await create_jwt(

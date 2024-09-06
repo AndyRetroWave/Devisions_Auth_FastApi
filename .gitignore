@@ -1,3 +1,6 @@
 .env
 .venv
 /apps/certs
+.ruff_cache
+.pytest_cache
+__pycache__

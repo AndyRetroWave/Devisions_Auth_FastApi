@@ -30,7 +30,7 @@
 
 1. Запустите сервер разработки:
    ```sh
-   poetry run python manage.py runserver
+   uvicorn main:app --reload
    ```
 2. Откройте браузер и перейдите по адресу:
    ```

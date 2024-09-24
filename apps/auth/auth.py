@@ -1,24 +1,22 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBearer
 
 from apps.auth.depends_auth_google import GoggleAuth
-from apps.depends.exception_user_auth import (
-    IncorrectInputEmailException,
-    IncorrectInputPasswordException,
-)
+from apps.auth.services_auth import TokenAuthValidate
 from apps.template.auth_html import AUTH_HTML
 from apps.user.dao import UserDAO
 from apps.user.models import User
 from apps.user.shemas import UserShemas
 
-from .jwt import TokenInfo, create_access_token, create_refresh_token
-from .password import hash_password
-from .validation import (
-    get_current_active_auth_user,
-    get_current_auth_refresh_token,
-    validate_user_login,
+from .jwt import (
+    CreateTokenPayload,
+    TokenInfo,
 )
+from .password import hash_password
+from .services_auth import GetTokenType
 
 # Create the auth appauthlib google register fastapi
 auth_app = FastAPI()
@@ -54,11 +52,8 @@ async def post_register(
     email: str = Form(...),
     password: str = Form(...),
 ):
-    hashed_password: str | bool = await hash_password(password)
-    if hashed_password is False:
-        raise IncorrectInputPasswordException()
-    if await UserDAO.add_user(given_name, family_name, email, hashed_password) is None:
-        raise IncorrectInputEmailException()
+    hashed_password = await hash_password(password)
+    await UserDAO.add_user(given_name, family_name, email, hashed_password) is None
     return HTMLResponse(AUTH_HTML["welcome_register"])
 
 
@@ -70,7 +65,7 @@ async def register_get_google(request: Request):
 
 @auth_app.get("/token")
 async def auth(request: Request):
-    access_token: str = await GoggleAuth.oauth.google.authorize_access_token(request)
+    access_token: dict = await GoggleAuth.oauth.google.authorize_access_token(request)
     userdata: dict = access_token["userinfo"]
     await UserDAO.add_user(
         given_names=userdata.get("given_name"),
@@ -87,9 +82,9 @@ async def get_login(request: Request):
 
 
 @router.post("/login", response_model=TokenInfo)
-async def post_login(user: UserShemas = Depends(validate_user_login)):
-    accession: str = await create_access_token(user)
-    refresh_token: str = await create_refresh_token(user)
+async def post_login(user: UserShemas = Depends(TokenAuthValidate.validate_user_login)):
+    accession: str = await CreateTokenPayload.create_access_token(user)
+    refresh_token: str = await CreateTokenPayload.create_refresh_token(user)
     return TokenInfo(
         access_token=accession,
         refresh_token=refresh_token,
@@ -98,7 +93,7 @@ async def post_login(user: UserShemas = Depends(validate_user_login)):
 
 @router.get("/users/me")
 async def auth_user_check_self_info(
-    user: UserShemas = Depends(get_current_active_auth_user),
+    user: UserShemas = Depends(GetTokenType.get_current_active_auth_user),
 ):
     return {
         "given_name": user.given_name,
@@ -107,13 +102,13 @@ async def auth_user_check_self_info(
 
 
 @router.get(path="/login/google")
-async def login_google(request: Request) -> GoggleAuth:
+async def login_google(request: Request):
     redirect_uri: str = GoggleAuth.FRONTEND_URL
     return await GoggleAuth.oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/check-email")
-async def check_email(email_check: str) -> dict:
+async def check_email(email_check: str) -> dict[Literal["exists"], bool]:
     try:
         user: User = await UserDAO.get_user_by_email(email_check)
         if user.email:
@@ -124,9 +119,10 @@ async def check_email(email_check: str) -> dict:
 
 @router.post("/refresh", response_model=TokenInfo)
 async def auth_refresh_token(
-    user: UserShemas = Depends(get_current_auth_refresh_token),
+    user: UserShemas = Depends(GetTokenType.get_current_auth_refresh_token),
 ):
-    access_token: str = await create_access_token(user)
+    access_token: str = await CreateTokenPayload.create_access_token(user)
+    access_token = []
     return TokenInfo(
         access_token=access_token,
     )

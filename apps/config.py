@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).parent.parent
@@ -21,7 +21,7 @@ class Setting(BaseSettings):
     MODE: Literal["DEV", "TEST", "PROD"] = "DEV"
 
     DB_USER: str
-    DB_PASS: str
+    DB_PASS: SecretStr
     DB_PORT: int
     DB_HOST: str
     DB_NAME: str

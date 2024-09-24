@@ -11,7 +11,7 @@ from apps.database import DATABASE_URL
 
 from alembic import context
 from apps.database import Base
-from apps.user.models import User
+from apps.user.models import User  # noqa: F401
 
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 

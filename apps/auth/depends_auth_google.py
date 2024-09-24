@@ -1,11 +1,10 @@
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter
 from starlette.config import Config
 
 from apps.config import settings
 
 
-class GoggleAuth(APIRouter):
+class GoggleAuth:
     GOOGLE_CLIENT_ID: str = settings.GOOGLE_CLIENT_ID or None
     GOOGLE_CLIENT_SECRET: str = settings.GOOGLE_CLIENT_SECRET or None
     if GOOGLE_CLIENT_ID is None or GOOGLE_CLIENT_SECRET is None:

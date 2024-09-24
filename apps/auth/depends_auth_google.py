@@ -1,12 +1,12 @@
-from authlib.integrations.starlette_client import OAuth
-from starlette.config import Config
+from authlib.integrations.starlette_client import OAuth  # type: ignore
+from starlette.config import Config  # type: ignore
 
 from apps.config import settings
 
 
 class GoggleAuth:
-    GOOGLE_CLIENT_ID: str = settings.GOOGLE_CLIENT_ID or None
-    GOOGLE_CLIENT_SECRET: str = settings.GOOGLE_CLIENT_SECRET or None
+    GOOGLE_CLIENT_ID: str | None = settings.GOOGLE_CLIENT_ID or None
+    GOOGLE_CLIENT_SECRET: str | None = settings.GOOGLE_CLIENT_SECRET or None
     if GOOGLE_CLIENT_ID is None or GOOGLE_CLIENT_SECRET is None:
         raise BaseException("Missing env variables")
 

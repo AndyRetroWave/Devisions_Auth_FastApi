@@ -28,6 +28,7 @@ ruff = "^0.6.3"
 faker = "^28.4.1"
 mypy = "^1.11.2"
 make = "^0.1.6.post2"
+coverage = "^7.6.1"
 
 [tool.ruff]
 exclude = [
@@ -90,3 +91,7 @@ docstring-code-line-length = "dynamic"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+files = ["apps/", "tests/"]    # Папка для проверки типов
+ignore_missing_imports = true 

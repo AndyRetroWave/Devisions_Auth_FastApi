@@ -40,35 +40,35 @@ class TokenAuthValidate:
         if isinstance(credentials, str):
             token: str = credentials
         else:
-            token: HTTPBasicCredentials = credentials.credentials
+            token: HTTPBasicCredentials = credentials.credentials  # type: ignore
         if token is None:
             raise HTTPException(
                 status.HTTP_401_UNAUTHORIZED, detail="Отстуствует токен"
             )
         try:
-            payload = await CreateTokenPayload.decode_jwt(token=token)
+            payload: dict = await CreateTokenPayload.decode_jwt(token=token)
         except InvalidTokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный токен"
             )
-        return payload
+        return payload  # type: ignore
 
     @staticmethod
     async def get_current_auth_data(
         type_token: str,
         payload: dict = Depends(get_current_token_payload),
     ) -> UserShemas:
-        token_type: str = payload.get(TOKEN_TYPE_FIELD)
+        token_type: str | None = payload.get(TOKEN_TYPE_FIELD)  # type: ignore
         if token_type != type_token:
             raise HTTPException(
                 status.HTTP_401_UNAUTHORIZED,
                 "Вы указали не верный тип токена, укажите access_token!",
             )
-        email: str | None = payload.get("sub")
-        user_data = await UserDAO.get_user_by_email(email=email)
+        email: str | None = payload.get("sub")  # type: ignore
+        user_data: User | None = await UserDAO.get_user_by_email(email=email)  # type: ignore
         if user_data is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-        return user_data
+        return user_data  # type: ignore
 
 
 class GetTokenType:
@@ -94,10 +94,10 @@ class GetTokenType:
     async def get_current_active_auth_user(
         user: UserShemas = Depends(get_current_auth_user),
     ) -> UserShemas:
-        user_data = await UserDAO.get_user_by_email(email=user.email)
+        user_data: User | None = await UserDAO.get_user_by_email(email=user.email)
         if user_data is None or not user_data.is_active:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Пользователь не активен!",
             )
-        return user_data
+        return user_data  # type: ignore

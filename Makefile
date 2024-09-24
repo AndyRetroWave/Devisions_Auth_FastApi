@@ -9,6 +9,7 @@ run:
 
 lint:
 	$(RUFF) check .
+	mypy .
 
 git-commit:
 	git add .

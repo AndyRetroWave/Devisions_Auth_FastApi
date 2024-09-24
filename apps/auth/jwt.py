@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any
 
-import aiofiles
+import aiofiles  # type: ignore
 import jwt
 from pydantic import BaseModel
 
@@ -18,7 +19,7 @@ class TokenInfo(BaseModel):
     refresh_token: str | None = None
 
 
-async def read_key(path: Path) -> str:
+async def read_key(path: Path) -> Any:
     async with aiofiles.open(path, mode="r") as f:
         return await f.read()
 
@@ -36,7 +37,7 @@ class CreateTokenPayload:
         if expire_timedelta:
             expire: datetime = now + expire_timedelta
         else:
-            expire: datetime = now + timedelta(minutes=expire_minutes)
+            expire: datetime = now + timedelta(minutes=expire_minutes)  # type: ignore
         to_encode.update({"exp": expire, "iat": now})
         private_key: str = await read_key(settings.AUTH_JWT.private_key_path)
         encoded: str = jwt.encode(to_encode, private_key, algorithm=algorithm)

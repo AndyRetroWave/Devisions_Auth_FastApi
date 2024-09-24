@@ -11,7 +11,7 @@ class BaseDAO:
     @classmethod
     async def find_by_id(cls, model_id: int):
         async with async_session_maker() as session:
-            query = select(cls.model).filter_by(id=model_id)
+            query = select(cls.model).filter_by(id=model_id)  # type: ignore
             result = await session.execute(query)
             return result.scalar_one_or_none()
 
@@ -45,7 +45,7 @@ class BaseDAO:
 
 
 class UserDAO(BaseDAO):
-    model = User
+    model = User()  # type: ignore
 
     @classmethod
     async def add_user(
@@ -62,7 +62,7 @@ class UserDAO(BaseDAO):
                     family_name=family_names,
                     email=email,
                     hashed_password=password,
-                )
+                )  # type: ignore
                 # print(user.compile(
                 #     engine, compile_kwargs={"loteral_binds": True}))
                 await session.execute(user)
@@ -74,6 +74,6 @@ class UserDAO(BaseDAO):
     @classmethod
     async def get_user_by_email(cls, email: str):
         async with async_session_maker() as session:
-            query = select(cls.model).where(cls.model.email == email)
+            query = select(cls.model).where(cls.model.email == email)  # type: ignore
             result = await session.execute(query)
             return result.scalar_one_or_none()

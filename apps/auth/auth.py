@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -64,14 +64,18 @@ async def register_get_google(request: Request):
 
 
 @auth_app.get("/token")
-async def auth(request: Request):
+async def auth(request: Request) -> RedirectResponse:
     access_token: dict = await GoggleAuth.oauth.google.authorize_access_token(request)
-    userdata: dict = access_token["userinfo"]
+    userdata: dict[str, Any] = access_token["userinfo"]
+    given_name: str | None = userdata.get("given_name")
+    family_name: str | None = userdata.get("family_name")
+    email: str | None = userdata.get("email")
+    at_hash: str | None = userdata.get("at_hash")
     await UserDAO.add_user(
-        given_names=userdata.get("given_name"),
-        family_names=userdata.get("family_name") or None,
-        email=userdata.get("email"),
-        password=userdata.get("at_hash"),
+        given_names=given_name,  # type: ignore
+        family_names=family_name,  # type: ignore
+        email=email,  # type: ignore
+        password=at_hash,  # type: ignore
     )
     return RedirectResponse(url="/welcome", status_code=303)
 
@@ -110,7 +114,7 @@ async def login_google(request: Request):
 @router.get("/check-email")
 async def check_email(email_check: str) -> dict[Literal["exists"], bool]:
     try:
-        user: User = await UserDAO.get_user_by_email(email_check)
+        user: User = await UserDAO.get_user_by_email(email_check)  # type: ignore
         if user.email:
             return {"exists": True}
     except:  # noqa: E722
@@ -122,7 +126,6 @@ async def auth_refresh_token(
     user: UserShemas = Depends(GetTokenType.get_current_auth_refresh_token),
 ):
     access_token: str = await CreateTokenPayload.create_access_token(user)
-    access_token = []
     return TokenInfo(
         access_token=access_token,
     )
